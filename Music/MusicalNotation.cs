@@ -8,7 +8,7 @@ namespace Music
 {
     class MusicalNotation
     {
-        private int Duration;
+        public int Duration;
 
         public void Play()
         {

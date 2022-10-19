@@ -8,7 +8,7 @@ namespace Music
 {
     class Note : MusicalNotation
     {
-        private int NoteNumber;
-        private int Volume;
+        public int NoteNumber;
+        public int Volume;
     }
 }
