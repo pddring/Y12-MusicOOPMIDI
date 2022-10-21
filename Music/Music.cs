@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.Midi;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,17 +14,23 @@ namespace Music
         List<MusicalNotation> Notes = new List<MusicalNotation>();
         public void Play()
         {
+            MidiOut player = new MidiOut(0);
+            Console.WriteLine("Using " + MidiOut.DeviceInfo(0).ProductName);
+
             Console.WriteLine($"Playing...");
             foreach(MusicalNotation n in Notes)
             {
+                n.MidiDevice = player;
                 n.Play();
                 if(n.GetType().Name == "Note")
                 {
                     Note note = (Note)n;
-                    Console.WriteLine($"Playing note: {note.NoteNumber} for {n.Duration} beat(s)");
+                    Console.WriteLine(n);
+                    //Console.WriteLine($"Playing note: {note.NoteNumber} for {n.Duration} beat(s)");
                 } else
                 {
-                    Console.WriteLine($"Resting for {n.Duration} beats");
+                    Console.WriteLine(n);
+                    //Console.WriteLine($"Resting for {n.Duration} beats");
                 }
                 //Console.WriteLine($"Playing note: {n.NoteNumber} for {n.Duration} beat(s)");
             }
