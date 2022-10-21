@@ -10,14 +10,22 @@ namespace Music
 {
     class Music
     {
-        List<Note> Notes = new List<Note>();
+        List<MusicalNotation> Notes = new List<MusicalNotation>();
         public void Play()
         {
             Console.WriteLine($"Playing...");
-            foreach(Note n in Notes)
+            foreach(MusicalNotation n in Notes)
             {
                 n.Play();
-                Console.WriteLine($"Playing note: {n}");
+                if(n.GetType().Name == "Note")
+                {
+                    Note note = (Note)n;
+                    Console.WriteLine($"Playing note: {note.NoteNumber} for {n.Duration} beat(s)");
+                } else
+                {
+                    Console.WriteLine($"Resting for {n.Duration} beats");
+                }
+                //Console.WriteLine($"Playing note: {n.NoteNumber} for {n.Duration} beat(s)");
             }
         }
 
@@ -86,30 +94,46 @@ G A B C D E F# G:2
 
             int octave = 4;
             // extract the notes
-            foreach(Match m in Regex.Matches(fileContents, @"([A-G])([b#])*(\d)*(:(\d))*"))
+            foreach(Match m in Regex.Matches(fileContents, @"([A-G])?([b#])?(\d)*(:(\d))?"))
             {
                 // get the note name
                 string note = m.Groups[1].Value;
 
-                // get the octave
-                if (m.Groups[3].Value.Length > 0)
+                // decide if it's a note or rest
+                if (note.Length > 0)
                 {
-                    octave = int.Parse(m.Groups[3].Value);
-                }
 
-                // get flat or sharp
-                bool flat = m.Groups[2].Value == "b";
-                bool sharp = m.Groups[2].Value == "#";
+                    // get the octave
+                    if (m.Groups[3].Value.Length > 0)
+                    {
+                        octave = int.Parse(m.Groups[3].Value);
+                    }
 
-                Note n = new Note();
-                n.NoteNumber = NoteToNumber(note[0], flat, sharp, octave);
-                n.Duration = 1;
-                if(m.Groups[5].Value.Length > 0)
+                    // get flat or sharp
+                    bool flat = m.Groups[2].Value == "b";
+                    bool sharp = m.Groups[2].Value == "#";
+
+                    Note n = new Note();
+                    n.NoteNumber = NoteToNumber(note[0], flat, sharp, octave);
+                    n.Duration = 1;
+                    if (m.Groups[5].Value.Length > 0)
+                    {
+                        n.Duration = int.Parse(m.Groups[5].Value);
+                    }
+
+                    Notes.Add(n);
+                } else
                 {
-                    n.Duration = int.Parse(m.Groups[5].Value);
+                    // rest
+                    Rest r = new Rest();
+                    r.Duration = 1;
+                    if (m.Groups[5].Value.Length > 0)
+                    {
+                        r.Duration = int.Parse(m.Groups[5].Value);
+                        Notes.Add(r);
+                    }
+                    
                 }
-
-                Notes.Add(n);
                 //Console.WriteLine($"Note: {note} Octave: {octave}: Number: {n.NoteNumber} Duration: {n.Duration}");
             }
             //Console.WriteLine(fileContents);
